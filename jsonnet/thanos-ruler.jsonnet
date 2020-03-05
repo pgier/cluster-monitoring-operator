@@ -145,6 +145,26 @@ local authorizationRole =
         secret.mixin.metadata.withNamespace(thanosRulerConfig.namespace) +
         secret.mixin.metadata.withLabels({ 'k8s-app': 'thanos' }),
 
+      // https://thanos.io/components/rule.md/#configuration
+      alertmanagerConfigSecret: {
+        kind: "Secret",
+        alertmanagers: [
+          {
+            http_config: {
+              bearer_token_file: "/var/run/secrets/kubernetes.io/serviceaccount/token",
+              tls_config: {
+                insecure_skip_verify: "true",
+                // ca_file: "/etc/thanos/"
+                server_name: "alertmanager-main.openshift-monitoring.svc"
+              },
+            },
+            path_prefix: "/",
+            scheme: 'https',
+            api_version: "v2",
+          },
+        ]
+      },
+
       serviceAccount:
         local serviceAccount = k.core.v1.serviceAccount;
 
@@ -234,9 +254,9 @@ local authorizationRole =
             },
           },
           queryEndpoints: [
-            'dnssrv+_web._tcp.thanos-querier.openshift-monitoring.svc.cluster.local'
+            'dnssrv+_http._tcp.thanos-querier.openshift-monitoring.svc.cluster.local'
           ],
-          alertManagersURL: 'dnssrv+_web._tcp.alertmanager-main.openshift-monitoring.svc.cluster.local',
+          alertManagersURL: 'dnssrv+http://_web._tcp.alertmanager-main.openshift-monitoring.svc.cluster.local',
           volumes: [
             volume.fromSecret('secret-thanos-ruler-tls', 'thanos-ruler-tls'),
             volume.fromSecret('secret-thanos-ruler-oauth-cookie', 'thanos-ruler-oauth-cookie'),

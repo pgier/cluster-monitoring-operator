@@ -6,7 +6,7 @@ metadata:
   name: user-workload
   namespace: openshift-user-workload-monitoring
 spec:
-  alertManagersURL: dnssrv+_web._tcp.alertmanager-main.openshift-monitoring.svc.cluster.local
+  alertManagersURL: dnssrv+http://_web._tcp.alertmanager-main.openshift-monitoring.svc.cluster.local
   containers:
   - args:
     - -provider=openshift
@@ -50,7 +50,7 @@ spec:
       name: secret-thanos-ruler-oauth-htpasswd
   image: quay.io/openshift/origin-thanos:latest
   queryEndpoints:
-  - dnssrv+_web._tcp.thanos-querier.openshift-monitoring.svc.cluster.local
+  - dnssrv+_http._tcp.thanos-querier.openshift-monitoring.svc.cluster.local
   replicas: 2
   ruleSelector:
     matchLabels:

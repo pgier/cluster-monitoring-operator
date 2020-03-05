@@ -15,6 +15,9 @@ spec:
   - name: tenancy
     port: 9092
     targetPort: tenancy
+  - name: http
+    port: 9090
+    targetPort: http
   selector:
     app.kubernetes.io/name: thanos-querier
   type: ClusterIP

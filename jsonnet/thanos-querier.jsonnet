@@ -156,6 +156,7 @@ local authorizationRole =
         service.mixin.spec.withPorts([
           ports.newNamed('web', 9091, 'web'),
           ports.newNamed('tenancy', 9092, 'tenancy'),
+          ports.newNamed('http', 9090, 'http'),
         ]),
 
       deployment+:
@@ -201,7 +202,7 @@ local authorizationRole =
                       'query',
                       '--query.replica-label=prometheus_replica',
                       '--grpc-address=127.0.0.1:10901',
-                      '--http-address=127.0.0.1:9090',
+                      '--http-address=0.0.0.0:9090',
                       '--grpc-client-tls-secure',
                       '--grpc-client-tls-cert=/etc/tls/grpc/client.crt',
                       '--grpc-client-tls-key=/etc/tls/grpc/client.key',
@@ -218,7 +219,12 @@ local authorizationRole =
                         cpu: '10m',
                       },
                     },
-                    ports+:: {},
+                    ports:  [
+                      {
+                        containerPort: 9090,
+                        name: 'http',
+                      },
+                    ],
                     volumeMounts: [
                       {
                         mountPath: '/etc/tls/grpc',
