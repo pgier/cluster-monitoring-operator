@@ -48,6 +48,8 @@ spec:
       name: secret-thanos-ruler-oauth-cookie
     - mountPath: /etc/proxy/htpasswd
       name: secret-thanos-ruler-oauth-htpasswd
+    - mountPath: /etc/tls/grpc
+      name: secret-grpc-tls
   image: quay.io/openshift/origin-thanos:latest
   queryEndpoints:
   - dnssrv+_http._tcp.thanos-querier.openshift-monitoring.svc.cluster.local

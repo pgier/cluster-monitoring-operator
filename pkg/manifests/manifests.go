@@ -2479,6 +2479,7 @@ func (f *Factory) ThanosQuerierDeployment(grpcTLS *v1.Secret, enableUserWorkload
 		d.Spec.Template.Spec.Containers[THANOS_QUERIER_CONTAINER_THANOS].Args = append(
 			d.Spec.Template.Spec.Containers[THANOS_QUERIER_CONTAINER_THANOS].Args,
 			"--store=dnssrv+_grpc._tcp.prometheus-operated.openshift-user-workload-monitoring.svc.cluster.local",
+			"--store=dnssrv+_grpc._tcp.thanos-ruler-operated.openshift-user-workload-monitoring.svc.cluster.local",
 		)
 	}
 
@@ -2817,7 +2818,7 @@ func (f *Factory) ThanosRulerRBACProxySecret() (*v1.Secret, error) {
 	return s, nil
 }
 
-func (f *Factory) ThanosRulerCustomResource(trustedCA *v1.ConfigMap) (*monv1.ThanosRuler, error) {
+func (f *Factory) ThanosRulerCustomResource(trustedCA *v1.ConfigMap, grpcTLS *v1.Secret) (*monv1.ThanosRuler, error) {
 	t, err := f.NewThanosRuler(MustAssetReader(ThanosRulerCustomResource))
 	if err != nil {
 		return nil, err
@@ -2875,6 +2876,17 @@ func (f *Factory) ThanosRulerCustomResource(trustedCA *v1.ConfigMap) (*monv1.Tha
 			Path: "tls-ca-bundle.pem",
 		})
 		t.Spec.Volumes = append(t.Spec.Volumes, volume)
+	}
+
+	if grpcTLS != nil {
+		t.Spec.Volumes = append(t.Spec.Volumes, v1.Volume{
+			Name: "secret-grpc-tls",
+			VolumeSource: v1.VolumeSource{
+				Secret: &v1.SecretVolumeSource{
+					SecretName: grpcTLS.GetName(),
+				},
+			},
+		})
 	}
 
 	t.Namespace = f.namespaceUserWorkload

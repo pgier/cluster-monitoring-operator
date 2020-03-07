@@ -235,6 +235,8 @@ local authorizationRole =
         },
       },
 
+      // TODO: need to add grpc-server-tls config to spec for secure communication
+      // from Thanos Querier to the local store.
       thanosRuler: {
         apiVersion: 'monitoring.coreos.com/v1',
         kind: 'ThanosRuler',
@@ -324,6 +326,10 @@ local authorizationRole =
                 {
                   mountPath: '/etc/proxy/htpasswd',
                   name: 'secret-thanos-ruler-oauth-htpasswd',
+                },
+                {
+                  mountPath: '/etc/tls/grpc',
+                  name: 'secret-grpc-tls',
                 },
               ],
             },
